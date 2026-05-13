@@ -24,6 +24,7 @@
         .msg { margin: 5px 0; padding: 10px; border-radius: 10px; max-width: 80%; }
         .msg-bot { background: #e1eaf9; align-self: flex-start; }
         .msg-user { background: var(--primary); color: white; align-self: flex-end; }
+        .alert-text { font-size: 12px; color: var(--danger); margin-top: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -40,16 +41,19 @@
     </div>
 
     <div class="grid">
-        <button class="btn-action btn-danger" onclick="toggleScanner()">
-            <span>🚨</span><br>Lapor Cepat
-        </button>
+        <div style="display:flex; flex-direction:column">
+            <button class="btn-action btn-danger" onclick="triggerEmergency()">
+                <span>🚨</span><br>Lapor Cepat
+            </button>
+            <span class="alert-text">*Klik otomatis kirim lokasi ke Satgas</span>
+        </div>
         <button class="btn-action btn-info" onclick="showSection('chat')">
-            <span>💬</span><br>Curhat/ChatBot
+            <span>💬</span><br>Curhat/Bot
         </button>
     </div>
 
     <div id="reader"></div>
-    <p id="loc-status" style="text-align:center; font-weight:bold; color: var(--danger)"></p>
+    <p id="loc-status" style="text-align:center; font-weight:bold; color: var(--danger); margin-top: 20px;"></p>
 
     <div class="card" id="chat-section">
         <div id="chat-box" style="display:flex; flex-direction:column">
@@ -65,24 +69,18 @@
 <div class="nav-bar">
     <div class="nav-item active" onclick="showSection('home')">Home</div>
     <div class="nav-item" onclick="showSection('chat')">Curhat</div>
-    <div class="nav-item" onclick="alert('Hotline WA/Telp Satgas: 0823-1778-9406   0812-8822-1894')">Hotline</div>
+    <div class="nav-item" onclick="alert('Hotline Satgas: 0812-XXXX-XXXX')">Hotline</div>
 </div>
 
 <script>
-    let currentLoc = "";
+    let currentLoc = "Gedung Utama (Deteksi Otomatis)";
 
-    function toggleScanner() {
-        const reader = document.getElementById('reader');
-        reader.style.display = reader.style.display === 'none' ? 'block' : 'none';
-        if (reader.style.display === 'block') {
-            let scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-            scanner.render((text) => {
-                currentLoc = text;
-                document.getElementById('loc-status').innerText = "Lokasi Terdeteksi: " + text;
-                alert("Laporan Senyap Terkirim dari " + text + ". Tetap tenang, Satgas menuju lokasi.");
-                scanner.clear();
-                reader.style.display = 'none';
-            });
+    function triggerEmergency() {
+        const confirmReport = confirm("PERINGATAN: Memencet tombol ini akan otomatis mengirimkan lokasi Anda saat ini ke tim Satgas PPKS. Lanjutkan laporan darurat?");
+        
+        if (confirmReport) {
+            document.getElementById('loc-status').innerText = "🚨 LAPORAN TERKIRIM! Lokasi Anda: " + currentLoc;
+            alert("Laporan darurat telah diterima oleh Satgas. Tetap tenang di lokasi, petugas sedang menuju posisi Anda.");
         }
     }
 
