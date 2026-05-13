@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="manifest" href="manifest.json">
     <title>Campus Guard - Satgas PPKS</title>
-    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root { --primary: #6c5ce7; --secondary: #a29bfe; --danger: #ff7675; --safe: #55efc4; --dark: #2d3436; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background: #f0f2f5; color: var(--dark); padding-bottom: 70px; }
@@ -16,15 +15,14 @@
         .btn-action { border: none; border-radius: 12px; padding: 15px; font-weight: bold; color: white; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-danger { background: var(--danger); }
         .btn-info { background: var(--primary); }
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; margin-top: 10px; display: none; }
         .nav-bar { position: fixed; bottom: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ddd; }
         .nav-item { cursor: pointer; font-size: 12px; color: #636e72; text-align: center; }
         .active { color: var(--primary); font-weight: bold; }
-        #chat-section { display: none; height: 300px; overflow-y: auto; flex-direction: column; }
-        .msg { margin: 5px 0; padding: 10px; border-radius: 10px; max-width: 80%; }
-        .msg-bot { background: #e1eaf9; align-self: flex-start; }
-        .msg-user { background: var(--primary); color: white; align-self: flex-end; }
-        .alert-text { font-size: 12px; color: var(--danger); margin-top: 5px; font-weight: bold; }
+        #chat-section { display: none; height: 350px; overflow-y: auto; flex-direction: column; }
+        .msg { margin: 5px 0; padding: 10px; border-radius: 10px; max-width: 80%; line-height: 1.4; }
+        .msg-bot { background: #e1eaf9; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg-user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .alert-text { font-size: 11px; color: var(--danger); margin-top: 5px; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
@@ -36,85 +34,108 @@
 
 <div class="container" id="main-content">
     <div class="card" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
-        <h3>Halo, Mahasiswa!</h3>
-        <p>Butuh bantuan atau ingin melapor secara anonim? Kami ada untuk melindungimu.</p>
+        <h3 style="margin-top:0">Halo, Mahasiswa!</h3>
+        <p style="margin-bottom:0">Butuh bantuan atau ingin melapor secara anonim? Kami ada untuk melindungimu.</p>
     </div>
 
-    <div class="grid">
+    <div class="grid" id="home-buttons">
         <div style="display:flex; flex-direction:column">
             <button class="btn-action btn-danger" onclick="triggerEmergency()">
-                <span>🚨</span><br>Lapor Cepat
+                <span style="font-size:24px">🚨</span><br>Lapor Cepat
             </button>
-            <span class="alert-text">*Klik otomatis kirim lokasi ke Satgas</span>
+            <span class="alert-text">*Otomatis kirim lokasi ke Satgas</span>
         </div>
         <button class="btn-action btn-info" onclick="showSection('chat')">
-            <span>💬</span><br>Curhat/Bot
+            <span style="font-size:24px">💬</span><br>Curhat/Bot
         </button>
     </div>
 
-    <div id="reader"></div>
-    <p id="loc-status" style="text-align:center; font-weight:bold; color: var(--danger); margin-top: 20px;"></p>
+    <p id="loc-status" style="text-align:center; font-weight:bold; color: var(--danger); margin-top: 20px; min-height: 24px;"></p>
 
     <div class="card" id="chat-section">
-        <div id="chat-box" style="display:flex; flex-direction:column">
-            <div class="msg msg-bot">Halo! Saya Bot Campus Guard. Ada yang ingin kamu ceritakan secara anonim?</div>
+        <div id="chat-box" style="display:flex; flex-direction:column; flex:1; overflow-y:auto">
+            <div class="msg msg-bot">Halo! Saya Bot Campus Guard. Ceritakan masalahmu di sini secara anonim. Identitasmu terjaga aman.</div>
         </div>
-        <div style="display:flex; margin-top:10px">
-            <input type="text" id="chat-input" style="flex:1; padding:10px; border-radius:5px; border:1px solid #ddd" placeholder="Ketik pesan...">
-            <button onclick="sendChat()" style="padding:10px; background:var(--primary); color:white; border:none; border-radius:5px; margin-left:5px">Kirim</button>
+        <div style="display:flex; margin-top:10px; border-top: 1px solid #eee; padding-top: 10px;">
+            <input type="text" id="chat-input" style="flex:1; padding:12px; border-radius:8px; border:1.5px solid #ddd" placeholder="Tulis sesuatu...">
+            <button onclick="sendChat()" style="padding:10px 15px; background:var(--primary); color:white; border:none; border-radius:8px; margin-left:8px; font-weight:bold">Kirim</button>
         </div>
     </div>
 </div>
 
 <div class="nav-bar">
-    <div class="nav-item active" onclick="showSection('home')">Home</div>
-    <div class="nav-item" onclick="showSection('chat')">Curhat</div>
-    <div class="nav-item" onclick="alert('Hotline Satgas: 0812-XXXX-XXXX')">Hotline</div>
+    <div class="nav-item active" onclick="showSection('home')">🏠<br>Home</div>
+    <div class="nav-item" onclick="showSection('chat')">💬<br>Curhat</div>
+    <div class="nav-item" onclick="alert('Hotline Darurat Satgas: 0812-XXXX-XXXX')">📞<br>Hotline</div>
 </div>
 
 <script>
-    let currentLoc = "Gedung Utama (Deteksi Otomatis)";
+    let currentLoc = "Gedung Utama UTDI (Lantai 2)";
 
     function triggerEmergency() {
-        const confirmReport = confirm("PERINGATAN: Memencet tombol ini akan otomatis mengirimkan lokasi Anda saat ini ke tim Satgas PPKS. Lanjutkan laporan darurat?");
+        const confirmReport = confirm("PERINGATAN: Memencet tombol ini akan mengirimkan lokasi Anda saat ini secara otomatis ke tim Satgas PPKS. Gunakan hanya dalam kondisi mendesak/bahaya. Lanjutkan?");
         
         if (confirmReport) {
-            document.getElementById('loc-status').innerText = "🚨 LAPORAN TERKIRIM! Lokasi Anda: " + currentLoc;
-            alert("Laporan darurat telah diterima oleh Satgas. Tetap tenang di lokasi, petugas sedang menuju posisi Anda.");
+            document.getElementById('loc-status').innerText = "🚨 LAPORAN TERKIRIM! Lokasi: " + currentLoc;
+            alert("Laporan darurat diterima. Tetaplah tenang dan cari tempat aman, petugas sedang menuju posisi Anda.");
         }
     }
 
     function showSection(section) {
-        document.getElementById('chat-section').style.display = section === 'chat' ? 'flex' : 'none';
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        if(section === 'chat') document.querySelectorAll('.nav-item')[1].classList.add('active');
-        else document.querySelectorAll('.nav-item')[0].classList.add('active');
+        const chatSec = document.getElementById('chat-section');
+        const homeBtns = document.getElementById('home-buttons');
+        const navs = document.querySelectorAll('.nav-item');
+
+        if(section === 'chat') {
+            chatSec.style.display = 'flex';
+            homeBtns.style.display = 'none';
+            navs[0].classList.remove('active');
+            navs[1].classList.add('active');
+        } else {
+            chatSec.style.display = 'none';
+            homeBtns.style.display = 'grid';
+            navs[1].classList.remove('active');
+            navs[0].classList.add('active');
+        }
     }
 
     function sendChat() {
         const input = document.getElementById('chat-input');
         const box = document.getElementById('chat-box');
-        if (!input.value) return;
+        if (!input.value.trim()) return;
 
         const userMsg = document.createElement('div');
         userMsg.className = "msg msg-user";
         userMsg.innerText = input.value;
         box.appendChild(userMsg);
 
+        const typingMsg = document.createElement('div');
+        typingMsg.className = "msg msg-bot";
+        typingMsg.innerText = "...";
+        box.appendChild(typingMsg);
+        box.scrollTop = box.scrollHeight;
+
         setTimeout(() => {
-            const botMsg = document.createElement('div');
-            botMsg.className = "msg msg-bot";
-            botMsg.innerText = "Laporan kamu telah kami terima secara anonim. Jika dalam kondisi bahaya, gunakan tombol 'Lapor Cepat'. Ingin kami hubungi lewat WhatsApp?";
-            box.appendChild(botMsg);
+            typingMsg.innerText = "Laporan curhat anonim kamu sudah tersimpan di database kami. Tim Satgas akan meninjau ini. Jika kamu butuh perlindungan segera, silakan tekan tombol 'Lapor Cepat' di halaman utama.";
             box.scrollTop = box.scrollHeight;
-        }, 1000);
+        }, 1200);
 
         input.value = "";
-        box.scrollTop = box.scrollHeight;
     }
 
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        if(confirm("Versi baru aplikasi tersedia. Refresh sekarang?")) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        });
     }
 </script>
 </body>
